@@ -3,11 +3,14 @@ import "./style.css";
 import {
     Engine,
     Scene,
-    ArcRotateCamera,
     Vector3,
     HemisphericLight,
-    MeshBuilder,
+    FlyCamera,
 } from "@babylonjs/core";
+import { Inspector } from "@babylonjs/inspector";
+import { Boid } from "./boid";
+
+const BOID_COUNT = 20;
 
 const canvas = document.getElementById("babylon-canvas");
 
@@ -15,29 +18,28 @@ if (canvas instanceof HTMLCanvasElement) {
     const engine = new Engine(canvas, true);
 
     const scene = new Scene(engine);
-    const camera = new ArcRotateCamera(
-        "camera",
-        0,
-        0,
-        10,
-        new Vector3(0, 0, 0),
-        scene,
-    );
-    camera.setPosition(new Vector3(0, 0, 20));
-    camera.attachControl(canvas, true);
+    const camera = new FlyCamera("camera", new Vector3(0, 0, -30), scene);
+    camera.attachControl();
 
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
     light.intensity = 0.7;
 
-    const box = MeshBuilder.CreateBox("box", { size: 1 });
+    for (let i = 0; i < BOID_COUNT; i++) {
+        Boid.create(scene);
+    }
 
     engine.runRenderLoop(() => {
-        const deltaTime = scene.deltaTime ?? 0;
-        box.rotation.y += 0.001 * deltaTime;
+        const deltaMS = scene.deltaTime ?? 0;
+        const deltaS = deltaMS * 0.001;
+
+        Boid.update(deltaS);
+
         scene.render();
     });
 
     window.addEventListener("resize", () => {
         engine.resize();
     });
+
+    Inspector.Show(scene, {});
 }

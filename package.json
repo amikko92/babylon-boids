@@ -18,6 +18,7 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
-    "@babylonjs/core": "^6.21.1"
+    "@babylonjs/core": "^6.21.1",
+    "@babylonjs/inspector": "^6.21.2"
   }
 }
