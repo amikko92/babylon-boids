@@ -42,7 +42,7 @@ export class Boid {
             0,
         );
         this.maxSpeed = 0.1;
-        this.maxForce = 1;
+        this.maxForce = 0.2;
 
         this.acceleration = new Vector3();
 
@@ -57,8 +57,13 @@ export class Boid {
     }
 
     public update(deltaTime: number) {
+        const wander = this.wanderForce();
         const avoidance = this.avoidanceForce();
-        this.applyForce(avoidance);
+
+        const targetForce = wander.add(avoidance);
+        const steerForce = this.steerForce(targetForce);
+        this.capLength(steerForce, this.maxForce);
+        this.applyForce(steerForce);
 
         this._velocity.addInPlace(this.acceleration.scaleInPlace(deltaTime));
         this.capLength(this._velocity, this.maxSpeed);
@@ -87,12 +92,8 @@ export class Boid {
         this.acceleration.addInPlace(force);
     }
 
-    public steer(target: Vector3) {
-        const desired = target.subtract(this.position);
-        // desired.normalize().scaleInPlace(this.maxForce);
-        this.capLength(desired, this.maxForce);
-        const steer = desired.subtract(this._velocity);
-        return steer;
+    public steerForce(desiredVelocity: Vector3) {
+        return desiredVelocity.subtract(this._velocity);
     }
 
     private capLength(v: Vector3, maxLength: number) {
@@ -103,27 +104,32 @@ export class Boid {
         }
     }
 
+    private wanderForce(): Vector3 {
+        const forward = this.node.forward;
+        forward.z = 0;
+        return forward.normalize().scale(1);
+    }
+
     private avoidanceForce(): Vector3 {
-        const avoidanceFactor = 5;
-        const seeDistanceSquared = Math.pow(5, 2);
+        const seeDistance = 5;
         const avoidanceForce = new Vector3();
+
+        // TODO: Don't just brute force through all boids
         for (const boid of Boid.boids) {
             if (boid === this) {
                 continue;
             }
 
-            const distanceSquared = Vector3.DistanceSquared(
-                this.position,
-                boid.position,
-            );
-            if (distanceSquared > seeDistanceSquared) {
+            const distance = Vector3.Distance(this.position, boid.position);
+            if (distance > seeDistance) {
                 continue;
             }
 
-            const avoid = this.position
-                .subtract(boid.position)
-                .normalize()
-                .scaleInPlace(avoidanceFactor);
+            const avoid = this.position.subtract(boid.position);
+            avoid.x /= distance;
+            avoid.y /= distance;
+            avoid.z = 0;
+
             avoidanceForce.addInPlace(avoid);
         }
         return avoidanceForce;
