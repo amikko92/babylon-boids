@@ -11,8 +11,8 @@ export function initPanes(): void {
     forcesFolder.addBinding(BOID_CONFIG, "alignmentForce", {
         label: "Alignment",
     });
-    forcesFolder.addBinding(BOID_CONFIG, "avoidanceForce", {
-        label: "Avoidance",
+    forcesFolder.addBinding(BOID_CONFIG, "separationForce", {
+        label: "Separation",
     });
     forcesFolder.addBinding(BOID_CONFIG, "boundsForce", {
         label: "Bounds",

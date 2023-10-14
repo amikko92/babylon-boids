@@ -5,7 +5,7 @@ export const BOID_CONFIG = {
     maxSpeed: 0.1,
     maxSteerForce: 0.1,
     wanderForce: 1,
-    avoidanceForce: 1,
+    separationForce: 1,
     alignmentForce: 1,
     cohesionForce: 1,
     boundsForce: 1,

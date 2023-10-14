@@ -63,7 +63,7 @@ export class Boid {
     public update(deltaTime: number) {
         const {
             alignmentForce,
-            avoidanceForce,
+            separationForce,
             boundsForce,
             cohesionForce,
             wanderForce,
@@ -72,13 +72,13 @@ export class Boid {
         } = BOID_CONFIG;
 
         const wander = this.wanderDirection().scale(wanderForce);
-        const avoidance = this.avoidanceDirection().scale(avoidanceForce);
+        const separation = this.separationDirection().scale(separationForce);
         const alignment = this.alignmentDirection().scale(alignmentForce);
         const cohesion = this.cohesionDirection().scale(cohesionForce);
         const bounds = this.boundsDirection().scale(boundsForce);
 
         const targetForce = wander
-            .add(avoidance)
+            .add(separation)
             .add(alignment)
             .add(cohesion)
             .add(bounds);
@@ -128,9 +128,9 @@ export class Boid {
         return wander.normalize();
     }
 
-    private avoidanceDirection(): Vector3 {
+    private separationDirection(): Vector3 {
         const { seeDistance } = BOID_CONFIG;
-        const avoidanceDirection = new Vector3();
+        const separationDirection = new Vector3();
 
         // TODO: Don't just brute force through all boids
         for (const boid of Boid.boids) {
@@ -143,14 +143,14 @@ export class Boid {
                 continue;
             }
 
-            const avoid = this.position.subtract(boid.position);
-            avoid.x /= distance;
-            avoid.y /= distance;
-            avoid.z = 0;
+            const separation = this.position.subtract(boid.position);
+            separation.x /= distance;
+            separation.y /= distance;
+            separation.z = 0;
 
-            avoidanceDirection.addInPlace(avoid);
+            separationDirection.addInPlace(separation);
         }
-        return avoidanceDirection.normalize();
+        return separationDirection.normalize();
     }
 
     private alignmentDirection(): Vector3 {
