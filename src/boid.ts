@@ -1,16 +1,5 @@
 import { MeshBuilder, Scene, TransformNode, Vector3 } from "@babylonjs/core";
-
-const SEE_DISTANCE = 5;
-const BOUNDS = {
-    WIDTH: 20,
-    HEIGHT: 20,
-};
-
-const WANDER_FACTOR = 2;
-const AVOIDANCE_FACTOR = 1.1;
-const ALIGNMENT_FACTOR = 0.9;
-const COHESION_FACTOR = 1.2;
-const BOUNDS_FACTOR = 3;
+import { BOID_CONFIG, BOUNDS } from "./configs";
 
 function randomRange(min: number, max: number): number {
     return Math.random() * (max - min) + min;
@@ -33,8 +22,6 @@ export class Boid {
 
     private _position: Vector3;
     private _velocity: Vector3;
-    private maxSpeed: number;
-    private maxForce: number;
     private acceleration: Vector3;
     private node: TransformNode;
     private wanderAngle: number;
@@ -58,8 +45,6 @@ export class Boid {
             Math.cos(2 * Math.PI * Math.random()),
             0,
         );
-        this.maxSpeed = 0.1;
-        this.maxForce = 0.2;
 
         this.acceleration = new Vector3();
 
@@ -76,11 +61,21 @@ export class Boid {
     }
 
     public update(deltaTime: number) {
-        const wander = this.wanderDirection().scale(WANDER_FACTOR);
-        const avoidance = this.avoidanceDirection().scale(AVOIDANCE_FACTOR);
-        const alignment = this.alignmentDirection().scale(ALIGNMENT_FACTOR);
-        const cohesion = this.cohesionDirection().scale(COHESION_FACTOR);
-        const bounds = this.boundsDirection().scale(BOUNDS_FACTOR);
+        const {
+            alignmentForce,
+            avoidanceForce,
+            boundsForce,
+            cohesionForce,
+            wanderForce,
+            maxSpeed,
+            maxSteerForce,
+        } = BOID_CONFIG;
+
+        const wander = this.wanderDirection().scale(wanderForce);
+        const avoidance = this.avoidanceDirection().scale(avoidanceForce);
+        const alignment = this.alignmentDirection().scale(alignmentForce);
+        const cohesion = this.cohesionDirection().scale(cohesionForce);
+        const bounds = this.boundsDirection().scale(boundsForce);
 
         const targetForce = wander
             .add(avoidance)
@@ -88,11 +83,11 @@ export class Boid {
             .add(cohesion)
             .add(bounds);
         const steerForce = this.steerForce(targetForce);
-        this.capLength(steerForce, this.maxForce);
+        this.capLength(steerForce, maxSteerForce);
         this.applyForce(steerForce);
 
         this._velocity.addInPlace(this.acceleration.scaleInPlace(deltaTime));
-        this.capLength(this._velocity, this.maxSpeed);
+        this.capLength(this._velocity, maxSpeed);
         this.position.addInPlace(this._velocity);
         this.acceleration.set(0, 0, 0);
 
@@ -134,6 +129,7 @@ export class Boid {
     }
 
     private avoidanceDirection(): Vector3 {
+        const { seeDistance } = BOID_CONFIG;
         const avoidanceDirection = new Vector3();
 
         // TODO: Don't just brute force through all boids
@@ -143,7 +139,7 @@ export class Boid {
             }
 
             const distance = Vector3.Distance(this.position, boid.position);
-            if (distance > SEE_DISTANCE) {
+            if (distance > seeDistance) {
                 continue;
             }
 
@@ -158,6 +154,7 @@ export class Boid {
     }
 
     private alignmentDirection(): Vector3 {
+        const { seeDistance } = BOID_CONFIG;
         const alignmentDirection = new Vector3();
         let count = 0;
 
@@ -167,7 +164,7 @@ export class Boid {
             }
 
             const distance = Vector3.Distance(this.position, boid.position);
-            if (distance > SEE_DISTANCE) {
+            if (distance > seeDistance) {
                 continue;
             }
 
@@ -185,6 +182,7 @@ export class Boid {
     }
 
     private cohesionDirection(): Vector3 {
+        const { seeDistance } = BOID_CONFIG;
         const averagePosition = new Vector3();
         let count = 0;
 
@@ -194,7 +192,7 @@ export class Boid {
             }
 
             const distance = Vector3.Distance(this.position, boid.position);
-            if (distance > SEE_DISTANCE) {
+            if (distance > seeDistance) {
                 continue;
             }
 
@@ -215,8 +213,8 @@ export class Boid {
 
     private boundsDirection(): Vector3 {
         const boundsDirection = new Vector3();
-        const boundsHalfWidth = BOUNDS.WIDTH * 0.5;
-        const boundsHalfHeight = BOUNDS.HEIGHT * 0.5;
+        const boundsHalfWidth = BOUNDS.width * 0.5;
+        const boundsHalfHeight = BOUNDS.height * 0.5;
 
         if (this.position.x > boundsHalfWidth) {
             boundsDirection.x = -1;

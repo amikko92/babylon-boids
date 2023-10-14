@@ -10,8 +10,10 @@ import {
 } from "@babylonjs/core";
 import { Inspector } from "@babylonjs/inspector";
 import { Boid } from "./boid";
+import { initPanes } from "./tweakpanes";
+import { BOID_COUNT } from "./configs";
 
-const BOID_COUNT = 50;
+initPanes();
 
 const canvas = document.getElementById("babylon-canvas");
 

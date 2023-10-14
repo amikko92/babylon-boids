@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@tweakpane/core": "^2.0.1",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
     "eslint": "^8.49.0",
@@ -19,6 +20,7 @@
   },
   "dependencies": {
     "@babylonjs/core": "^6.21.1",
-    "@babylonjs/inspector": "^6.21.2"
+    "@babylonjs/inspector": "^6.21.2",
+    "tweakpane": "^4.0.1"
   }
 }
