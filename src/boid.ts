@@ -7,6 +7,10 @@ const AVOIDANCE_FACTOR = 1.1;
 const ALIGNMENT_FACTOR = 1;
 const COHESION_FACTOR = 1.2;
 
+function randomRange(min: number, max: number): number {
+    return Math.random() * (max - min) + min;
+}
+
 export class Boid {
     private static boids: Boid[] = [];
 
@@ -28,6 +32,7 @@ export class Boid {
     private maxForce: number;
     private acceleration: Vector3;
     private node: TransformNode;
+    private wanderAngle: number;
 
     public get position(): Vector3 {
         return this._position;
@@ -52,6 +57,8 @@ export class Boid {
         this.maxForce = 0.2;
 
         this.acceleration = new Vector3();
+
+        this.wanderAngle = 0;
 
         this.node = new TransformNode(`boid${Boid.id++}`, scene);
         const cone = MeshBuilder.CreateCylinder("cone", {
@@ -114,9 +121,20 @@ export class Boid {
     }
 
     private wanderDirection(): Vector3 {
-        const forward = this.node.forward; // TODO: Something more interesting
-        forward.z = 0;
-        return forward.normalize();
+        this.wanderAngle += 0.1 * randomRange(-2 * Math.PI, 2 * Math.PI);
+        const randomCirclePoint = new Vector3(
+            Math.sin(this.wanderAngle),
+            Math.cos(this.wanderAngle),
+            0,
+        );
+
+        const positionAhead = this.position.add(this.node.forward.scale(3));
+        positionAhead.z = 0;
+
+        const target = positionAhead.add(randomCirclePoint);
+        const wander = target.subtract(this.position);
+
+        return wander.normalize();
     }
 
     private avoidanceDirection(): Vector3 {
