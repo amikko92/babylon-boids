@@ -10,7 +10,7 @@ import {
 import { Inspector } from "@babylonjs/inspector";
 import { Boid } from "./boid";
 
-const BOID_COUNT = 20;
+const BOID_COUNT = 50;
 
 const canvas = document.getElementById("babylon-canvas");
 

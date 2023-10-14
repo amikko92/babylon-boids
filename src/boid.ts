@@ -1,5 +1,12 @@
 import { MeshBuilder, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 
+const SEE_DISTANCE = 5;
+
+const WANDER_FACTOR = 1;
+const AVOIDANCE_FACTOR = 1.1;
+const ALIGNMENT_FACTOR = 1;
+const COHESION_FACTOR = 1.2;
+
 export class Boid {
     private static boids: Boid[] = [];
 
@@ -57,10 +64,12 @@ export class Boid {
     }
 
     public update(deltaTime: number) {
-        const wander = this.wanderForce();
-        const avoidance = this.avoidanceForce();
+        const wander = this.wanderDirection().scale(WANDER_FACTOR);
+        const avoidance = this.avoidanceDirection().scale(AVOIDANCE_FACTOR);
+        const alignment = this.alignmentDirection().scale(ALIGNMENT_FACTOR);
+        const cohesion = this.cohesionDirection().scale(COHESION_FACTOR);
 
-        const targetForce = wander.add(avoidance);
+        const targetForce = wander.add(avoidance).add(alignment).add(cohesion);
         const steerForce = this.steerForce(targetForce);
         this.capLength(steerForce, this.maxForce);
         this.applyForce(steerForce);
@@ -104,15 +113,14 @@ export class Boid {
         }
     }
 
-    private wanderForce(): Vector3 {
-        const forward = this.node.forward;
+    private wanderDirection(): Vector3 {
+        const forward = this.node.forward; // TODO: Something more interesting
         forward.z = 0;
-        return forward.normalize().scale(1);
+        return forward.normalize();
     }
 
-    private avoidanceForce(): Vector3 {
-        const seeDistance = 5;
-        const avoidanceForce = new Vector3();
+    private avoidanceDirection(): Vector3 {
+        const avoidanceDirection = new Vector3();
 
         // TODO: Don't just brute force through all boids
         for (const boid of Boid.boids) {
@@ -121,7 +129,7 @@ export class Boid {
             }
 
             const distance = Vector3.Distance(this.position, boid.position);
-            if (distance > seeDistance) {
+            if (distance > SEE_DISTANCE) {
                 continue;
             }
 
@@ -130,8 +138,64 @@ export class Boid {
             avoid.y /= distance;
             avoid.z = 0;
 
-            avoidanceForce.addInPlace(avoid);
+            avoidanceDirection.addInPlace(avoid);
         }
-        return avoidanceForce;
+        return avoidanceDirection.normalize();
+    }
+
+    private alignmentDirection(): Vector3 {
+        const alignmentDirection = new Vector3();
+        let count = 0;
+
+        for (const boid of Boid.boids) {
+            if (boid === this) {
+                continue;
+            }
+
+            const distance = Vector3.Distance(this.position, boid.position);
+            if (distance > SEE_DISTANCE) {
+                continue;
+            }
+
+            alignmentDirection.addInPlace(boid.velocity);
+            count += 1;
+        }
+
+        if (count > 0) {
+            alignmentDirection.x /= count;
+            alignmentDirection.y /= count;
+            alignmentDirection.z = 0;
+        }
+
+        return alignmentDirection.normalize();
+    }
+
+    private cohesionDirection(): Vector3 {
+        const averagePosition = new Vector3();
+        let count = 0;
+
+        for (const boid of Boid.boids) {
+            if (boid === this) {
+                continue;
+            }
+
+            const distance = Vector3.Distance(this.position, boid.position);
+            if (distance > SEE_DISTANCE) {
+                continue;
+            }
+
+            averagePosition.addInPlace(boid.position);
+            count += 1;
+        }
+
+        if (count > 0) {
+            averagePosition.x /= count;
+            averagePosition.y /= count;
+            averagePosition.z = 0;
+        }
+
+        const cohesionDirection = averagePosition.subtract(this.position);
+
+        return cohesionDirection.normalize();
     }
 }
