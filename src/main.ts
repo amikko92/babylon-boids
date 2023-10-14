@@ -6,6 +6,7 @@ import {
     Vector3,
     HemisphericLight,
     FlyCamera,
+    KeyboardEventTypes,
 } from "@babylonjs/core";
 import { Inspector } from "@babylonjs/inspector";
 import { Boid } from "./boid";
@@ -19,7 +20,7 @@ if (canvas instanceof HTMLCanvasElement) {
 
     const scene = new Scene(engine);
     const camera = new FlyCamera("camera", new Vector3(0, 0, -30), scene);
-    camera.attachControl();
+    camera.fov = 1;
 
     const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
     light.intensity = 0.7;
@@ -41,5 +42,14 @@ if (canvas instanceof HTMLCanvasElement) {
         engine.resize();
     });
 
-    Inspector.Show(scene, {});
+    scene.onKeyboardObservable.add((keyboardInfo) => {
+        const { type, event } = keyboardInfo;
+        if (type === KeyboardEventTypes.KEYUP && event.key === "i") {
+            if (Inspector.IsVisible) {
+                Inspector.Hide();
+            } else {
+                Inspector.Show(scene, {});
+            }
+        }
+    });
 }

@@ -1,11 +1,16 @@
 import { MeshBuilder, Scene, TransformNode, Vector3 } from "@babylonjs/core";
 
 const SEE_DISTANCE = 5;
+const BOUNDS = {
+    WIDTH: 20,
+    HEIGHT: 20,
+};
 
-const WANDER_FACTOR = 1;
+const WANDER_FACTOR = 2;
 const AVOIDANCE_FACTOR = 1.1;
-const ALIGNMENT_FACTOR = 1;
+const ALIGNMENT_FACTOR = 0.9;
 const COHESION_FACTOR = 1.2;
+const BOUNDS_FACTOR = 3;
 
 function randomRange(min: number, max: number): number {
     return Math.random() * (max - min) + min;
@@ -75,8 +80,13 @@ export class Boid {
         const avoidance = this.avoidanceDirection().scale(AVOIDANCE_FACTOR);
         const alignment = this.alignmentDirection().scale(ALIGNMENT_FACTOR);
         const cohesion = this.cohesionDirection().scale(COHESION_FACTOR);
+        const bounds = this.boundsDirection().scale(BOUNDS_FACTOR);
 
-        const targetForce = wander.add(avoidance).add(alignment).add(cohesion);
+        const targetForce = wander
+            .add(avoidance)
+            .add(alignment)
+            .add(cohesion)
+            .add(bounds);
         const steerForce = this.steerForce(targetForce);
         this.capLength(steerForce, this.maxForce);
         this.applyForce(steerForce);
@@ -85,20 +95,6 @@ export class Boid {
         this.capLength(this._velocity, this.maxSpeed);
         this.position.addInPlace(this._velocity);
         this.acceleration.set(0, 0, 0);
-
-        const boundsX = 20;
-        if (this.position.x > boundsX) {
-            this.position.x = -boundsX;
-        } else if (this.position.x < -boundsX) {
-            this.position.x = boundsX;
-        }
-
-        const boundsY = 20;
-        if (this.position.y > boundsY) {
-            this.position.y = -boundsY;
-        } else if (this.position.y < -boundsY) {
-            this.position.y = boundsY;
-        }
 
         this.node.position.copyFrom(this.position);
         this.node.lookAt(this.position.add(this.velocity));
@@ -215,5 +211,25 @@ export class Boid {
         const cohesionDirection = averagePosition.subtract(this.position);
 
         return cohesionDirection.normalize();
+    }
+
+    private boundsDirection(): Vector3 {
+        const boundsDirection = new Vector3();
+        const boundsHalfWidth = BOUNDS.WIDTH * 0.5;
+        const boundsHalfHeight = BOUNDS.HEIGHT * 0.5;
+
+        if (this.position.x > boundsHalfWidth) {
+            boundsDirection.x = -1;
+        } else if (this.position.x < -boundsHalfWidth) {
+            boundsDirection.x = 1;
+        }
+
+        if (this.position.y > boundsHalfHeight) {
+            boundsDirection.y = -1;
+        } else if (this.position.y < -boundsHalfHeight) {
+            boundsDirection.y = 1;
+        }
+
+        return boundsDirection.normalize();
     }
 }
