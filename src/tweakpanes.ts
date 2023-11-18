@@ -1,7 +1,8 @@
 import { Pane } from "tweakpane";
-import { BOID_CONFIG, BOUNDS } from "./configs";
+import { BOID_CONFIG, BOUNDARY_AREA } from "./configs";
+import { BoundaryArea } from "./boundingBox";
 
-export function initPanes(): void {
+export function initPanes(boundaryArea: BoundaryArea): void {
     const pane = new Pane({ title: "Boids" });
     pane.addBinding(BOID_CONFIG, "seeDistance", { label: "See Distance" });
     pane.addBinding(BOID_CONFIG, "maxSpeed", { label: "Max Speed" });
@@ -24,8 +25,27 @@ export function initPanes(): void {
         label: "Wander",
     });
 
-    const boundsFolder = pane.addFolder({ title: "Bounds" });
-    boundsFolder.addBinding(BOUNDS, "width");
-    boundsFolder.addBinding(BOUNDS, "height");
-    boundsFolder.addBinding(BOUNDS, "depth");
+    const boundaryAreaFolder = pane.addFolder({ title: "Boundary Area" });
+    const widthBinding = boundaryAreaFolder.addBinding(BOUNDARY_AREA, "width");
+    widthBinding.on("change", (event) => {
+        boundaryArea.width = event.value;
+    });
+    const heightBinding = boundaryAreaFolder.addBinding(
+        BOUNDARY_AREA,
+        "height",
+    );
+    heightBinding.on("change", (event) => {
+        boundaryArea.height = event.value;
+    });
+    const depthBinding = boundaryAreaFolder.addBinding(BOUNDARY_AREA, "depth");
+    depthBinding.on("change", (event) => {
+        boundaryArea.depth = event.value;
+    });
+    const boundsVisible = boundaryAreaFolder.addBinding(
+        BOUNDARY_AREA,
+        "visible",
+    );
+    boundsVisible.on("change", (event) => {
+        boundaryArea.visible = event.value;
+    });
 }

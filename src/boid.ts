@@ -1,6 +1,5 @@
 import {
     Color3,
-    Material,
     Mesh,
     MeshBuilder,
     Scene,
@@ -8,7 +7,7 @@ import {
     TransformNode,
     Vector3,
 } from "@babylonjs/core";
-import { BOID_CONFIG, BOUNDS } from "./configs";
+import { BOID_CONFIG, BOUNDARY_AREA } from "./configs";
 
 function randomRange(min: number, max: number): number {
     return Math.random() * (max - min) + min;
@@ -235,9 +234,9 @@ export class Boid {
 
     private boundsDirection(): Vector3 {
         const boundsDirection = new Vector3();
-        const boundsHalfWidth = BOUNDS.width * 0.5;
-        const boundsHalfHeight = BOUNDS.height * 0.5;
-        const boundsHalfDepth = BOUNDS.depth * 0.5;
+        const boundsHalfWidth = BOUNDARY_AREA.width * 0.5;
+        const boundsHalfHeight = BOUNDARY_AREA.height * 0.5;
+        const boundsHalfDepth = BOUNDARY_AREA.depth * 0.5;
 
         if (this.position.x > boundsHalfWidth) {
             boundsDirection.x = -1;

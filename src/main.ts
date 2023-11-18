@@ -14,8 +14,7 @@ import { Inspector } from "@babylonjs/inspector";
 import { Boid } from "./boid";
 import { initPanes } from "./tweakpanes";
 import { BOID_COUNT } from "./configs";
-
-initPanes();
+import { BoundaryArea } from "./boundingBox";
 
 const canvas = document.getElementById("babylon-canvas");
 
@@ -68,4 +67,7 @@ if (canvas instanceof HTMLCanvasElement) {
             }
         }
     });
+
+    const boundaryArea = new BoundaryArea(scene);
+    initPanes(boundaryArea);
 }

@@ -11,8 +11,9 @@ export const BOID_CONFIG = {
     boundsForce: 1,
 };
 
-export const BOUNDS = {
+export const BOUNDARY_AREA = {
     width: 20,
     height: 20,
     depth: 20,
+    visible: false,
 };
