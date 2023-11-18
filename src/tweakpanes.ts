@@ -7,7 +7,7 @@ import { Scene } from "@babylonjs/core";
 export function initPanes(scene: Scene, boundaryArea: BoundaryArea): void {
     const pane = new Pane({ title: "Boids" });
     const boidCountBinding = pane.addBinding(BOID_CONFIG, "count", {
-        label: "boid Count",
+        label: "Boid Count",
         min: 0,
         format: (v) => v.toFixed(0),
     });
