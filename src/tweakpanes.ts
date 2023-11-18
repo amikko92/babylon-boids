@@ -1,9 +1,20 @@
 import { Pane } from "tweakpane";
 import { BOID_CONFIG, BOUNDARY_AREA } from "./configs";
 import { BoundaryArea } from "./boundingBox";
+import { Boid } from "./boid";
+import { Scene } from "@babylonjs/core";
 
-export function initPanes(boundaryArea: BoundaryArea): void {
+export function initPanes(scene: Scene, boundaryArea: BoundaryArea): void {
     const pane = new Pane({ title: "Boids" });
+    const boidCountBinding = pane.addBinding(BOID_CONFIG, "count", {
+        label: "boid Count",
+        min: 0,
+        format: (v) => v.toFixed(0),
+    });
+    boidCountBinding.on("change", (event) => {
+        Boid.setCount(scene, event.value);
+    });
+
     pane.addBinding(BOID_CONFIG, "seeDistance", { label: "See Distance" });
     pane.addBinding(BOID_CONFIG, "maxSpeed", { label: "Max Speed" });
     pane.addBinding(BOID_CONFIG, "maxSteerForce", { label: "Max Steer Force" });

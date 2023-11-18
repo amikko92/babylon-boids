@@ -1,6 +1,5 @@
-export const BOID_COUNT = 500;
-
 export const BOID_CONFIG = {
+    count: 100,
     seeDistance: 5,
     maxSpeed: 0.1,
     maxSteerForce: 0.1,

@@ -13,8 +13,8 @@ import {
 import { Inspector } from "@babylonjs/inspector";
 import { Boid } from "./boid";
 import { initPanes } from "./tweakpanes";
-import { BOID_COUNT } from "./configs";
 import { BoundaryArea } from "./boundingBox";
+import { BOID_CONFIG } from "./configs";
 
 const canvas = document.getElementById("babylon-canvas");
 
@@ -40,9 +40,7 @@ if (canvas instanceof HTMLCanvasElement) {
     light.diffuse = Color3.White();
     light.intensity = 0.9;
 
-    for (let i = 0; i < BOID_COUNT; i++) {
-        Boid.create(scene);
-    }
+    Boid.setCount(scene, BOID_CONFIG.count);
 
     engine.runRenderLoop(() => {
         const deltaMS = scene.deltaTime ?? 0;
@@ -69,5 +67,5 @@ if (canvas instanceof HTMLCanvasElement) {
     });
 
     const boundaryArea = new BoundaryArea(scene);
-    initPanes(boundaryArea);
+    initPanes(scene, boundaryArea);
 }

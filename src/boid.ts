@@ -45,6 +45,22 @@ export class Boid {
         }
     }
 
+    public static setCount(scene: Scene, count: number) {
+        const currentCount = Boid.boids.length;
+        const difference = count - currentCount;
+        if (count > currentCount) {
+            for (let i = 0; i < difference; i++) {
+                Boid.create(scene);
+            }
+        } else if (currentCount > 0) {
+            const removeCount = currentCount - Math.max(0, count);
+            const removedBoids = Boid.boids.splice(0, Math.max(0, removeCount));
+            removedBoids.forEach((boid) => {
+                boid.node.dispose();
+            });
+        }
+    }
+
     private static id = 0;
 
     private _position: Vector3;
