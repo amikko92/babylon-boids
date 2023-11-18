@@ -5,16 +5,15 @@ import {
     Scene,
     Vector3,
     HemisphericLight,
-    KeyboardEventTypes,
     Color4,
     Color3,
     ArcRotateCamera,
 } from "@babylonjs/core";
-import { Inspector } from "@babylonjs/inspector";
 import { Boid } from "./boid";
 import { initPanes } from "./tweakpanes";
 import { BoundaryArea } from "./boundingBox";
 import { BOID_CONFIG } from "./configs";
+import { setupInspector } from "./inspector";
 
 const canvas = document.getElementById("babylon-canvas");
 
@@ -55,17 +54,7 @@ if (canvas instanceof HTMLCanvasElement) {
         engine.resize();
     });
 
-    scene.onKeyboardObservable.add((keyboardInfo) => {
-        const { type, event } = keyboardInfo;
-        if (type === KeyboardEventTypes.KEYUP && event.key === "i") {
-            if (Inspector.IsVisible) {
-                Inspector.Hide();
-            } else {
-                Inspector.Show(scene, {});
-            }
-        }
-    });
-
     const boundaryArea = new BoundaryArea(scene);
     initPanes(scene, boundaryArea);
+    setupInspector(scene);
 }
