@@ -1,7 +1,10 @@
 import {
+    Color3,
+    Material,
     Mesh,
     MeshBuilder,
     Scene,
+    StandardMaterial,
     TransformNode,
     Vector3,
 } from "@babylonjs/core";
@@ -17,12 +20,21 @@ export class Boid {
 
     public static create(scene: Scene) {
         if (Boid.cone === undefined) {
-            Boid.cone = MeshBuilder.CreateCylinder("cone", {
+            const cone = MeshBuilder.CreateCylinder("cone", {
                 diameterBottom: 1,
                 diameterTop: 0,
                 height: 1,
             });
-            Boid.cone.isVisible = false;
+
+            const material = new StandardMaterial("cone-material", scene);
+            material.diffuseColor = Color3.Red();
+            material.ambientColor = Color3.Red();
+            material.specularPower = 100;
+
+            cone.material = material;
+            cone.isVisible = false;
+
+            Boid.cone = cone;
         }
 
         this.boids.push(new Boid(scene));
