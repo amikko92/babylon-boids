@@ -14,6 +14,14 @@ Preview production build: `npm run preview`
 
 ## Features
 
+### Controls
+
+**Desktop** - Click and drag with your mouse to rotate the camera. Use the mouse wheel to zoom.
+
+**Mobile** - Swipe with your finger to rotate the camera. Pinch with two fingers to zoom.
+
+### Tweakpane panel
+
 Tweak the parameters used for the boids simulation using the tweakpane panel.
 The following parameters are available.
 
