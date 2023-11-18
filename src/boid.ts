@@ -66,7 +66,7 @@ export class Boid {
         this._position = new Vector3(
             (Math.random() - 0.5) * 2 * 10,
             (Math.random() - 0.5) * 2 * 10,
-            0,
+            (Math.random() - 0.5) * 2 * 10,
         );
         this._velocity = new Vector3(
             Math.sin(2 * Math.PI * Math.random()),
@@ -140,11 +140,10 @@ export class Boid {
         const randomCirclePoint = new Vector3(
             Math.sin(this.wanderAngle),
             Math.cos(this.wanderAngle),
-            0,
+            Math.sin(this.wanderAngle),
         );
 
         const positionAhead = this.position.add(this.node.forward.scale(3));
-        positionAhead.z = 0;
 
         const target = positionAhead.add(randomCirclePoint);
         const wander = target.subtract(this.position);
@@ -169,7 +168,7 @@ export class Boid {
             const separation = this.position.subtract(boid.position);
             separation.x /= distance;
             separation.y /= distance;
-            separation.z = 0;
+            separation.z /= distance;
 
             separationDirection.addInPlace(separation);
         }
@@ -198,7 +197,7 @@ export class Boid {
         if (count > 0) {
             alignmentDirection.x /= count;
             alignmentDirection.y /= count;
-            alignmentDirection.z = 0;
+            alignmentDirection.z /= count;
         }
 
         return alignmentDirection.normalize();
@@ -226,7 +225,7 @@ export class Boid {
         if (count > 0) {
             averagePosition.x /= count;
             averagePosition.y /= count;
-            averagePosition.z = 0;
+            averagePosition.z /= count;
         }
 
         const cohesionDirection = averagePosition.subtract(this.position);
@@ -238,6 +237,7 @@ export class Boid {
         const boundsDirection = new Vector3();
         const boundsHalfWidth = BOUNDS.width * 0.5;
         const boundsHalfHeight = BOUNDS.height * 0.5;
+        const boundsHalfDepth = BOUNDS.depth * 0.5;
 
         if (this.position.x > boundsHalfWidth) {
             boundsDirection.x = -1;
@@ -249,6 +249,12 @@ export class Boid {
             boundsDirection.y = -1;
         } else if (this.position.y < -boundsHalfHeight) {
             boundsDirection.y = 1;
+        }
+
+        if (this.position.z > boundsHalfDepth) {
+            boundsDirection.z = -1;
+        } else if (this.position.z < -boundsHalfDepth) {
+            boundsDirection.z = 1;
         }
 
         return boundsDirection.normalize();

@@ -5,10 +5,10 @@ import {
     Scene,
     Vector3,
     HemisphericLight,
-    FlyCamera,
     KeyboardEventTypes,
     Color4,
     Color3,
+    ArcRotateCamera,
 } from "@babylonjs/core";
 import { Inspector } from "@babylonjs/inspector";
 import { Boid } from "./boid";
@@ -25,7 +25,14 @@ if (canvas instanceof HTMLCanvasElement) {
     const scene = new Scene(engine);
     scene.clearColor = Color4.FromHexString("#FFFFFF");
 
-    const camera = new FlyCamera("camera", new Vector3(0, 0, -30), scene);
+    const camera = new ArcRotateCamera(
+        "camera",
+        0,
+        0,
+        50,
+        Vector3.Zero(),
+        scene,
+    );
     camera.fov = 1;
     camera.attachControl();
 

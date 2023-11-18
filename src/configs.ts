@@ -14,4 +14,5 @@ export const BOID_CONFIG = {
 export const BOUNDS = {
     width: 20,
     height: 20,
+    depth: 20,
 };

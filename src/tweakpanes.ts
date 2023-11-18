@@ -27,4 +27,5 @@ export function initPanes(): void {
     const boundsFolder = pane.addFolder({ title: "Bounds" });
     boundsFolder.addBinding(BOUNDS, "width");
     boundsFolder.addBinding(BOUNDS, "height");
+    boundsFolder.addBinding(BOUNDS, "depth");
 }
