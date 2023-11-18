@@ -1,4 +1,10 @@
-import { MeshBuilder, Scene, TransformNode, Vector3 } from "@babylonjs/core";
+import {
+    Mesh,
+    MeshBuilder,
+    Scene,
+    TransformNode,
+    Vector3,
+} from "@babylonjs/core";
 import { BOID_CONFIG, BOUNDS } from "./configs";
 
 function randomRange(min: number, max: number): number {
@@ -7,8 +13,18 @@ function randomRange(min: number, max: number): number {
 
 export class Boid {
     private static boids: Boid[] = [];
+    private static cone?: Mesh;
 
     public static create(scene: Scene) {
+        if (Boid.cone === undefined) {
+            Boid.cone = MeshBuilder.CreateCylinder("cone", {
+                diameterBottom: 1,
+                diameterTop: 0,
+                height: 1,
+            });
+            Boid.cone.isVisible = false;
+        }
+
         this.boids.push(new Boid(scene));
     }
 
@@ -51,13 +67,9 @@ export class Boid {
         this.wanderAngle = 0;
 
         this.node = new TransformNode(`boid${Boid.id++}`, scene);
-        const cone = MeshBuilder.CreateCylinder("cone", {
-            diameterBottom: 1,
-            diameterTop: 0,
-            height: 1,
-        });
-        cone.rotate(Vector3.Right(), 1.5708); // 90 degrees
-        cone.setParent(this.node);
+        const cone = Boid.cone?.createInstance("cone");
+        cone?.rotate(Vector3.Right(), 1.5708); // 90 degrees
+        cone?.setParent(this.node);
     }
 
     public update(deltaTime: number) {
@@ -132,7 +144,6 @@ export class Boid {
         const { seeDistance } = BOID_CONFIG;
         const separationDirection = new Vector3();
 
-        // TODO: Don't just brute force through all boids
         for (const boid of Boid.boids) {
             if (boid === this) {
                 continue;

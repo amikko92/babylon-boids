@@ -1,4 +1,4 @@
-export const BOID_COUNT = 50;
+export const BOID_COUNT = 500;
 
 export const BOID_CONFIG = {
     seeDistance: 5,
